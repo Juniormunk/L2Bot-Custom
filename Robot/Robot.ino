@@ -26,6 +26,7 @@ void loop()
    if (Serial.available() > 0) {
                 // read the incoming byte:
                 incomingSignal = Serial.readStringUntil('\n');
+                incomingSignal = incomingSignal.substring(incomingSignal.indexOf("."),incomingSignal.length())
 
         }
       if(incomingSignal.equals("BRAKE"))
@@ -50,7 +51,7 @@ void loop()
           int colonSpace = incomingSignal.indexOf(':');
           if(colonSpace != -1)
           {
-            int leftMotorSpeed = incomingSignal.substring(incomingSignal.indexOf(".")+1,colonSpace).toInt();
+            int leftMotorSpeed = incomingSignal.substring(0,colonSpace).toInt();
             int rightMotorSpeed = incomingSignal.substring(colonSpace+1,incomingSignal.length()).toInt();
             motor.speed(1, leftMotorSpeed); 
             motor.speed(0, rightMotorSpeed); 
