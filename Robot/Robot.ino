@@ -1,5 +1,5 @@
 #include <MotorDriver.h>
-
+String incomingSignal;
 MotorDriver motor;
 
 unsigned long lastWatchDogInt;
@@ -15,16 +15,19 @@ void setup()
 //Right is 0 Left is 1
 
 //  Input Data 
-//  Motor Speed = Left:Right
+//  Motor Speed = .Left:Right
 //  Motor Brake = BRAKE
 //  Motor Brake = BRAKE (L|R)
 //  WatchDog = WATCHDOG
 
 void loop() 
 {
-    if (Serial.available() > 0) 
-    {
-      String incomingSignal = Serial.readString();
+
+   if (Serial.available() > 0) {
+                // read the incoming byte:
+                incomingSignal = Serial.readStringUntil('\n');
+
+        }
       if(incomingSignal.equals("BRAKE"))
       {
         //BRAKE
@@ -47,7 +50,7 @@ void loop()
           int colonSpace = incomingSignal.indexOf(':');
           if(colonSpace != -1)
           {
-            int leftMotorSpeed = incomingSignal.substring(0,colonSpace).toInt();
+            int leftMotorSpeed = incomingSignal.substring(incomingSignal.indexOf(".")+1,colonSpace).toInt();
             int rightMotorSpeed = incomingSignal.substring(colonSpace+1,incomingSignal.length()).toInt();
             motor.speed(1, leftMotorSpeed); 
             motor.speed(0, rightMotorSpeed); 
@@ -68,7 +71,6 @@ void loop()
           }
 
       }
-    }
 //    if (millis()-lastWatchDogInt>1000)
 //    {
 //      //Stop Motor
