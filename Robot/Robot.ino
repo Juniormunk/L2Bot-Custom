@@ -10,15 +10,22 @@ void setup()
   Serial.begin(115200);
   Serial.setTimeout(10);
   motor.begin();
+
+  pinMode(52, OUTPUT);
+  digitalWrite(52, HIGH);
 }
 //INFO
 //Right is 0 Left is 1
 
 //  Input Data 
 //  Motor Speed = .Left:Right
-//  Motor Brake = BRAKE
-//  Motor Brake = BRAKE (L|R)
-//  WatchDog = WATCHDOG
+//  Motor Brake = .BRAKE
+//  Motor Brake = .BRAKE (L|R)
+//  WatchDog = .WATCHDOG
+
+//  Output Data
+//  Encoder Feedback = ENC:ENC
+//  On Target Feedback = 
 
 void loop() 
 {
@@ -26,7 +33,7 @@ void loop()
    if (Serial.available() > 0) {
                 // read the incoming byte:
                 incomingSignal = Serial.readStringUntil('\n');
-                incomingSignal = incomingSignal.substring(incomingSignal.indexOf("."),incomingSignal.length())
+                incomingSignal = incomingSignal.substring(incomingSignal.indexOf(".")+1,incomingSignal.length());
 
         }
       if(incomingSignal.equals("BRAKE"))

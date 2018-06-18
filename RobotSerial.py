@@ -12,13 +12,15 @@ class RobotSerial:
         #self.arduinoSerialData.setRTS(False)
         self.arduinoSerialData.open()
 
-    def Move(self, left, right):
-        self.arduinoSerialData.write(b"."+str(left)+":"+str(right)+"\n")
-    def Brake(self):
-        arduinoSerialData.write(b".0:0\n")
-    def BrakeR(self):
-        arduinoSerialData.write(b".BRAKER\n")
-    def BrakeL(self):
-        arduinoSerialData.write(b".BRAKEL\n")
+    def move(self, left, right):
+
+        self.arduinoSerialData.write(("."+str(left)+":"+str(right)+"\n").encode())
+    def brake(self):
+        self.arduinoSerialData.write(b".0:0\n")
+    def brakeR(self):
+        self.arduinoSerialData.write(b".BRAKER\n")
+    def brakeL(self):
+        self.arduinoSerialData.write(b".BRAKEL\n")
+    def arcadeDrive(self, throttle, turn):
+        self.arduinoSerialData.write(("."+str(-throttle-turn)+":"+str(throttle+turn)+"\n").encode())
     #def WatchDog(self):
-        
