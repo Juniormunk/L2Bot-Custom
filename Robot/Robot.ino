@@ -5,7 +5,7 @@ MotorDriver motor;
 unsigned long lastWatchDogInt;
 unsigned long currentWatchDogInt;
 
-void setup() 
+void setup()
 {
   Serial.begin(115200);
   Serial.setTimeout(10);
@@ -17,7 +17,7 @@ void setup()
 //INFO
 //Right is 0 Left is 1
 
-//  Input Data 
+//  Input Data
 //  Motor Speed = .Left:Right
 //  Motor Brake = .BRAKE
 //  Motor Brake = .BRAKE (L|R)
@@ -25,65 +25,80 @@ void setup()
 
 //  Output Data
 //  Encoder Feedback = ENC:ENC
-//  On Target Feedback = 
+//  On Target Feedback =
 
-void loop() 
+void loop()
 {
+  parseSerial();
+}
 
-   if (Serial.available() > 0) {
-                // read the incoming byte:
-                incomingSignal = Serial.readStringUntil('\n');
-                incomingSignal = incomingSignal.substring(incomingSignal.indexOf(".")+1,incomingSignal.length());
 
-        }
-      if(incomingSignal.equals("BRAKE"))
+void parseSerial()
+{
+  if (Serial.available() > 0)
+  {
+    incomingSignal = Serial.readStringUntil('\n');
+    incomingSignal = incomingSignal.substring(incomingSignal.indexOf(".") + 1, incomingSignal.length());
+    int colonSpace = incomingSignal.indexOf(':');
+    updateWatchDog();
+    
+    if (colonSpace == -1)
+    {
+      if (incomingSignal.equals("BRAKE"))
       {
-        //BRAKE
-        motor.brake(1);
-        motor.brake(0);
+        brakeR();
+        brakeL();
       }
-      else if(incomingSignal.equals("BRAKE R"))
+      else if (incomingSignal.equals("BRAKE R"))
       {
-        //BRAKE
-        motor.brake(0);
+        brakeR();
       }
-      else if(incomingSignal.equals("BRAKE L"))
+      else if (incomingSignal.equals("BRAKE L"))
       {
-        //BRAKE
-        motor.brake(1);
+        brakeL();
       }
-      else
-      {
+    }
+    else
+    {
+      int leftMotorSpeed = incomingSignal.substring(0, colonSpace).toInt();
+      int rightMotorSpeed = incomingSignal.substring(colonSpace + 1, incomingSignal.length()).toInt();
+      drive(leftMotorSpeed, rightMotorSpeed);
+    }
+  }
+}
 
-          int colonSpace = incomingSignal.indexOf(':');
-          if(colonSpace != -1)
-          {
-            int leftMotorSpeed = incomingSignal.substring(0,colonSpace).toInt();
-            int rightMotorSpeed = incomingSignal.substring(colonSpace+1,incomingSignal.length()).toInt();
-            motor.speed(1, leftMotorSpeed); 
-            motor.speed(0, rightMotorSpeed); 
-            if(leftMotorSpeed==0)
-            {
-              motor.stop(1);
-              motor.brake(1);
-            }
-            if(rightMotorSpeed==0)
-            {
-              motor.stop(0);
-              motor.brake(0);
-            }
-          }
-          else
-          {
-            lastWatchDogInt = millis();
-          }
+void updateWatchDog()
+{
+  lastWatchDogInt = millis();
+  //    if (millis()-lastWatchDogInt>1000)
+  //    {
+  //      //Stop Motor
+  //      motor.stop(1);
+  //      motor.stop(0);
+  //      Serial.println("STOP!!!!!!");
+  //    }
+}
+void brakeR()
+{
+  motor.brake(0);
+}
+void brakeL()
+{
+  motor.brake(1);
+}
+void drive(int left, int right)
+{
+  motor.speed(1, left);
+  motor.speed(0, right);
+  if (left == 0)
+  {
+    motor.stop(1);
+    motor.brake(1);
+  }
+  if (right == 0)
+  {
+    motor.stop(0);
+    motor.brake(0);
+  }
 
-      }
-//    if (millis()-lastWatchDogInt>1000)
-//    {
-//      //Stop Motor
-//      motor.stop(1);
-//      motor.stop(0);
-//      Serial.println("STOP!!!!!!");
-//    }
 }
